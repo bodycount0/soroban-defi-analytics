@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import {
   AreaChart,
   Area,
@@ -10,7 +11,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Download } from "lucide-react";
 import type { VolumeDataPoint } from "@/services/sorobanApi";
+import { downloadCsv, buildCsvFilename } from "@/utils/exportCsv";
 
 interface VolumeChartProps {
   data: VolumeDataPoint[];
@@ -66,6 +69,17 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export default function VolumeChart({ data }: VolumeChartProps) {
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = useCallback(() => {
+    setExporting(true);
+    // Brief delay so the loading state is perceptible
+    setTimeout(() => {
+      downloadCsv(data, buildCsvFilename());
+      setExporting(false);
+    }, 200);
+  }, [data]);
+
   return (
     <div className="card w-full min-w-0 overflow-hidden animate-fade-in">
       <div className="flex items-center justify-between mb-5">
@@ -75,7 +89,21 @@ export default function VolumeChart({ data }: VolumeChartProps) {
             Daily trading volume by protocol (USD)
           </p>
         </div>
-        <span className="badge-slate">Last 30 days</span>
+        <div className="flex items-center gap-3">
+          <span className="badge-slate">Last 30 days</span>
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            aria-label="Export CSV"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                       bg-indigo-600 hover:bg-indigo-500 text-white transition-colors
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download size={14} className={exporting ? "animate-pulse" : ""} />
+            {exporting ? "Exporting…" : "Export CSV"}
+          </button>
+        </div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
