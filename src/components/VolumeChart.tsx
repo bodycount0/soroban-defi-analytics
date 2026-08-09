@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { VolumeDataPoint } from "@/services/sorobanApi";
+import { toCsvRows, downloadCsv } from "@/utils/csv";
 
 interface VolumeChartProps {
   data: VolumeDataPoint[];
@@ -66,6 +67,19 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export default function VolumeChart({ data }: VolumeChartProps) {
+  const handleExportCsv = () => {
+    const rows = data.map((d) => ({
+      date: d.date,
+      soroswap_volume: d.soroswap,
+      phoenix_volume: d.phoenix,
+      blend_volume: d.blend,
+      total_volume: d.total,
+    }));
+    const csv = toCsvRows(rows);
+    const today = new Date().toISOString().split("T")[0];
+    downloadCsv(csv, `soroban-tvl-${today}.csv`);
+  };
+
   return (
     <div className="card w-full min-w-0 overflow-hidden animate-fade-in">
       <div className="flex items-center justify-between mb-5">
@@ -75,7 +89,30 @@ export default function VolumeChart({ data }: VolumeChartProps) {
             Daily trading volume by protocol (USD)
           </p>
         </div>
-        <span className="badge-slate">Last 30 days</span>
+        <div className="flex items-center gap-3">
+          <span className="badge-slate">Last 30 days</span>
+          <button
+            onClick={handleExportCsv}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition-colors border border-slate-600"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export CSV
+          </button>
+        </div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
