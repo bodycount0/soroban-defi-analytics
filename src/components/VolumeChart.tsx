@@ -10,7 +10,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { VolumeDataPoint } from "@/services/sorobanApi";
+import { useCurrency } from "../context/CurrencyContext";
+import type { VolumeDataPoint } from "../services/sorobanApi";
 
 interface VolumeChartProps {
   data: VolumeDataPoint[];
@@ -20,12 +21,6 @@ const COLORS = {
   soroswap: "#6366f1",
   phoenix: "#f59e0b",
   blend: "#10b981",
-};
-
-const formatUSD = (value: number) => {
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-  return `$${value}`;
 };
 
 const formatDate = (dateStr: string) => {
@@ -39,7 +34,12 @@ interface CustomTooltipProps {
   label?: string;
 }
 
-const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+const CustomTooltipContent = ({
+  active,
+  payload,
+  label,
+  formatFn,
+}: CustomTooltipProps & { formatFn: (v: number) => string }) => {
   if (!active || !payload?.length) return null;
 
   return (
@@ -57,7 +57,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
             <span className="text-slate-300 capitalize">{entry.name}</span>
           </span>
           <span className="font-semibold text-slate-100">
-            {formatUSD(entry.value)}
+            {formatFn(entry.value)}
           </span>
         </div>
       ))}
@@ -66,13 +66,15 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export default function VolumeChart({ data }: VolumeChartProps) {
+  const { currency, formatCompact } = useCurrency();
+
   return (
     <div className="card w-full min-w-0 overflow-hidden animate-fade-in">
       <div className="flex items-center justify-between mb-5">
         <div>
           <h2 className="section-title mb-0">30-Day Volume Trends</h2>
           <p className="text-slate-400 text-sm mt-0.5">
-            Daily trading volume by protocol (USD)
+            Daily trading volume by protocol ({currency})
           </p>
         </div>
         <span className="badge-slate">Last 30 days</span>
@@ -115,14 +117,14 @@ export default function VolumeChart({ data }: VolumeChartProps) {
           />
 
           <YAxis
-            tickFormatter={formatUSD}
+            tickFormatter={formatCompact}
             tick={{ fill: "#94a3b8", fontSize: 11 }}
             axisLine={false}
             tickLine={false}
             width={56}
           />
 
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltipContent formatFn={formatCompact} />} />
 
           <Legend
             wrapperStyle={{ paddingTop: "16px", fontSize: "12px" }}

@@ -214,6 +214,14 @@ export const fetchVolumeHistory = async (): Promise<VolumeDataPoint[]> => {
   });
 };
 
+// ─── XLM price (USD per XLM) ─────────────────────────────────
+//  In production, replace with a live price feed (e.g. CoinGecko,
+//  Stellar Expert, or a public XLM/USD oracle endpoint).
+export const fetchXlmPrice = async (): Promise<number> => {
+  await delay(60);
+  return 0.1; // simulated: 1 XLM ≈ $0.10
+};
+
 // ─── Dashboard Summary ────────────────────────────────────────
 export const fetchDashboardSummary = async (): Promise<DashboardSummary> => {
   await delay(80);
