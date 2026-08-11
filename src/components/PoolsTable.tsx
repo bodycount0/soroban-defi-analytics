@@ -1,16 +1,15 @@
-import type { LiquidityPool } from "@/services/sorobanApi";
+"use client";
+
+import { useCurrency } from "../context/CurrencyContext";
+import type { LiquidityPool } from "../services/sorobanApi";
 
 interface PoolsTableProps {
   pools: LiquidityPool[];
 }
 
-const formatUSD = (n: number) => {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
-  return `$${n}`;
-};
-
 export default function PoolsTable({ pools }: PoolsTableProps) {
+  const { format } = useCurrency();
+
   return (
     <div className="card animate-fade-in">
       <div className="flex items-center justify-between mb-5">
@@ -46,7 +45,6 @@ export default function PoolsTable({ pools }: PoolsTableProps) {
                 className="hover:bg-slate-700/30 transition-colors duration-100"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
-                {/* Pair */}
                 <td className="px-6 py-3.5 font-semibold text-slate-100 whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     <div className="flex -space-x-1">
@@ -63,27 +61,22 @@ export default function PoolsTable({ pools }: PoolsTableProps) {
                   </div>
                 </td>
 
-                {/* Protocol */}
                 <td className="px-6 py-3.5 text-slate-400 whitespace-nowrap">
                   {pool.protocol}
                 </td>
 
-                {/* TVL */}
                 <td className="px-6 py-3.5 font-semibold text-slate-100 tabular-nums whitespace-nowrap">
-                  {formatUSD(pool.tvl)}
+                  {format(pool.tvl)}
                 </td>
 
-                {/* Volume */}
                 <td className="px-6 py-3.5 text-slate-300 tabular-nums whitespace-nowrap">
-                  {formatUSD(pool.volume24h)}
+                  {format(pool.volume24h)}
                 </td>
 
-                {/* Fee */}
                 <td className="px-6 py-3.5 text-slate-400 tabular-nums whitespace-nowrap">
                   {pool.fee > 0 ? `${(pool.fee / 100).toFixed(2)}%` : "—"}
                 </td>
 
-                {/* APY */}
                 <td className="px-6 py-3.5 whitespace-nowrap">
                   <span className="badge-green">{pool.apy}%</span>
                 </td>

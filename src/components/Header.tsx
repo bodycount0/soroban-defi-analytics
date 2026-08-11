@@ -1,15 +1,12 @@
+"use client";
+
 import { Activity, Github, ExternalLink } from "lucide-react";
-import type { DashboardSummary } from "@/services/sorobanApi";
+import { useCurrency } from "../context/CurrencyContext";
+import type { DashboardSummary } from "../services/sorobanApi";
 
 interface HeaderProps {
   summary: DashboardSummary;
 }
-
-const formatUSD = (n: number) => {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
-  return `$${n}`;
-};
 
 const StatPill = ({
   label,
@@ -38,7 +35,28 @@ const StatPill = ({
   </div>
 );
 
+function CurrencySwitcher() {
+  const { currency, toggleCurrency } = useCurrency();
+
+  return (
+    <button
+      onClick={toggleCurrency}
+      className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-lg text-xs font-medium text-slate-300 hover:text-indigo-300 transition-colors"
+      title={`Switch to ${currency === "USD" ? "XLM" : "USD"}`}
+    >
+      <span
+        className={`w-1.5 h-1.5 rounded-full ${
+          currency === "USD" ? "bg-indigo-400" : "bg-amber-400"
+        }`}
+      />
+      {currency === "USD" ? "USD" : "XLM"}
+    </button>
+  );
+}
+
 export default function Header({ summary }: HeaderProps) {
+  const { format } = useCurrency();
+
   return (
     <header className="border-b border-slate-700/60 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-6 py-4">
@@ -59,7 +77,8 @@ export default function Header({ summary }: HeaderProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Live indicator */}
+            <CurrencySwitcher />
+
             <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-green-900/30 border border-green-800/40 rounded-full text-xs text-green-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse-slow" />
               Live
@@ -82,11 +101,11 @@ export default function Header({ summary }: HeaderProps) {
         <div className="flex flex-wrap gap-2">
           <StatPill
             label="Total TVL"
-            value={formatUSD(summary.totalTVL)}
+            value={format(summary.totalTVL)}
           />
           <StatPill
             label="24h Volume"
-            value={formatUSD(summary.totalVolume24h)}
+            value={format(summary.totalVolume24h)}
           />
           <StatPill
             label="TVL Change"
