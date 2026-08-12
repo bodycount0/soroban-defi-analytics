@@ -33,6 +33,22 @@ const formatDate = (dateStr: string) => {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
+function exportCSV(data: VolumeDataPoint[]) {
+  const header = "date,soroswap_volume,phoenix_volume,blend_volume,total_volume";
+  const rows = data.map((d) => `${d.date},${d.soroswap},${d.phoenix},${d.blend},${d.total}`);
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const today = new Date().toISOString().slice(0, 10);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `soroban-tvl-${today}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{ name: string; value: number; color: string }>;
@@ -75,7 +91,15 @@ export default function VolumeChart({ data }: VolumeChartProps) {
             Daily trading volume by protocol (USD)
           </p>
         </div>
-        <span className="badge-slate">Last 30 days</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => exportCSV(data)}
+            className="px-3 py-1.5 text-xs font-medium bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors"
+          >
+            Export CSV
+          </button>
+          <span className="badge-slate">Last 30 days</span>
+        </div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
