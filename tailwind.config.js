@@ -43,3 +43,4 @@ module.exports = {
   },
   plugins: [],
 };
+# bounty-fix-ref: https://github.com/bodycount0/soroban-defi-analytics/issues/4
