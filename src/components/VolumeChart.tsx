@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { VolumeDataPoint } from "@/services/sorobanApi";
+import { downloadCsv, buildCsvFilename } from "@/utils/exportCsv";
 
 interface VolumeChartProps {
   data: VolumeDataPoint[];
@@ -68,14 +69,36 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 export default function VolumeChart({ data }: VolumeChartProps) {
   return (
     <div className="card w-full min-w-0 overflow-hidden animate-fade-in">
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
         <div>
           <h2 className="section-title mb-0">30-Day Volume Trends</h2>
           <p className="text-slate-400 text-sm mt-0.5">
             Daily trading volume by protocol (USD)
           </p>
         </div>
-        <span className="badge-slate">Last 30 days</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => downloadCsv(data, buildCsvFilename())}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shadow-sm cursor-pointer"
+            aria-label="Export CSV"
+          >
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            Export CSV
+          </button>
+          <span className="badge-slate">Last 30 days</span>
+        </div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
