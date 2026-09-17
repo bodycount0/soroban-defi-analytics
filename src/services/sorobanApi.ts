@@ -225,3 +225,6 @@ export const fetchDashboardSummary = async (): Promise<DashboardSummary> => {
     tvlChange24h: 4.3,
   };
 };
+
+// ─── Re-export Soroswap DEX Adapter ───────────────────────────
+export * from "./adapters/soroswapAdapter";
